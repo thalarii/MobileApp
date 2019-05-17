@@ -9,6 +9,16 @@ npm install
 ```
 npm run serve
 ```
+## For Android 
+```
+$npm install -g cordova # If cordova is not already installed 
+$ vue add cordova
+$ npm run cordova-serve-android # Development Android 
+$ npm run cordova-build-android # Build Android
+
+$npm install --save vue-cordova
+```
+
 
 ### Compiles and minifies for production
 ```
