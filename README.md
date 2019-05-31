@@ -1,4 +1,4 @@
-# zhio
+# Thalari
 
 ## Project setup
 ```
