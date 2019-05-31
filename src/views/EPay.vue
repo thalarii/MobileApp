@@ -11,9 +11,6 @@
       ></v-text-field>
       <v-btn @click="scan">Scan</v-btn>
       <v-btn @click="getCheckOutOrder(checkOutOrdeId)">Get</v-btn>
-      <!-- qrcode:{{qrcode}} -->
-      <!-- <br> -->
-      <!-- qrcodes: {{qrcodes}} -->
     </v-card>
     <Reciept></Reciept>
     <SelectService></SelectService>
@@ -59,15 +56,15 @@ export default {
     // },
     scan: function() {
       this.qrcode = "result pending...";
-      cordova.plugins.barcodeScanner.scan(
-        result => {
-          // this.qrcode = result.text;
-          this.checkOutOrdeId = result.text;
-        },
-        err => {
-          console.err(error);
-        }
-      );
+      // cordova.plugins.barcodeScanner.scan(
+      //   result => {
+      //     // this.qrcode = result.text;
+      //     this.checkOutOrdeId = result.text;
+      //   },
+      //   err => {
+      //     console.err(error);
+      //   }
+      // );
     }
     // getCheckOutOrders(){
     //   this.
@@ -83,5 +80,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
