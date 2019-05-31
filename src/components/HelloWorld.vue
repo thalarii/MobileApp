@@ -8,7 +8,7 @@
       <v-btn flat style="float:right;margin-top" @click="clearHistory">clear all</v-btn>
       <v-subheader>History</v-subheader>
       <div v-for="(item, index) in allHistories" :key="index">
-        <v-list-tile avatar>
+        <v-list-tile avatar @click="deleteHistory(index)">
           <v-list-tile-avatar>
             <img :src="item.url_logo">
           </v-list-tile-avatar>
@@ -37,7 +37,7 @@ import ServiceCards from "./ServiceCards.vue";
 import ToolBar from "./ToolBar.vue";
 export default {
   computed: mapGetters(["allHistories"]),
-  methods: mapActions(["clearHistory"]),
+  methods: mapActions(["clearHistory", "deleteHistory"]),
   data: () => ({
     drawer: null,
     itemss: [
