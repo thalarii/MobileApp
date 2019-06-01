@@ -8,33 +8,30 @@ Vue.use(VueAxios, axios);
 
 export default new Vuex.Store({
   state: {
+    amountToPay: 0,
+    darkMode: false,
     checkOutOrderItems: null,
     account: null,
     selectedService: null,
     puk: null,
-    // checkOutOrderId: "",
-    histories: [
-      // {
-      //   id: 1,
-      //   name: "Tea",
-      //   price: 20,
-      //   quantity: 1,
-      //   date: "Apr 21, 2019",
-      //   image: "",
-      //   purchased_with: "CBE Birr",
-      //   url_logo: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-      // },
-      // {
-      //   id: 2,
-      //   name: "Coffee",
-      //   price: 12,
-      //   quantity: 2,
-      //   date: "Apr 21, 2019",
-      //   image: "",
-      //   purchased_with: "CBE Birr",
-      //   url_logo: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-      // }
+    selectedAccountNumber: "",
+    totalAmount: 0,
+    contacts: [
+      {
+        name: "Demeke",
+        accountNumber: "+2519421494"
+      },
+      {
+        name: "Takele",
+        accountNumber: "+2519347544"
+      },
+      {
+        name: "Daniel",
+        accountNumber: "+2519114987"
+      }
     ],
+    // checkOutOrderId: "",
+    histories: [],
     avaliableServices: [
       {
         id: 2,
@@ -82,9 +79,13 @@ export default new Vuex.Store({
     confirmationSheet: false,
     successSheet: false,
     failureSheet: false,
-    amountSheet: false
+    amountSheet: false,
+    serviceSelectorOPaySheet: false
   },
   mutations: {
+    UPDATE_DARK_MODE(state) {
+      state.darkMode = !state.darkMode;
+    },
     RECIEPT_TO_SERVICE_SELECTER(state) {
       state.recieptSheet = false;
       state.serviceSelectorSheet = true;
@@ -106,6 +107,10 @@ export default new Vuex.Store({
     CONFIRMATION_TO_FAILURE(state) {
       state.successSheet = false;
       state.failureSheet = true;
+    },
+    AMOUNT_TO_SELECT_SERVICE_OPAY(state) {
+      state.amountSheet = false;
+      state.serviceSelectorOPaySheet = true;
     },
     SUCCESS_TO(state) {
       state.successSheet = false;
@@ -147,9 +152,44 @@ export default new Vuex.Store({
     },
     SET_SERVICE_ACTIVE(state, index) {
       state.avaliableServices[index].activated = "true";
+    },
+    SET_AMOUNT(state, amount) {
+      state.amountToPay = 100;
+    },
+    DELETE_HISTORY(state, index) {
+      state.histories.pop(index);
+    },
+    ADD_CONTACT(state, contact) {
+      state.contacts.push(contact);
+    },
+    SET_ACCOUNT_NUMBER(state, accountNumber) {
+      state.selectedAccountNumber = accountNumber;
+    },
+    SET_TOTAL_AMOUNT(state, checkOutOrderItems) {
+      let totalPrice = 0;
+      for (let i = 0; i < checkOutOrderItems.length; i++) {
+        const element = checkOutOrderItems[i];
+        totalPrice = totalPrice + element.item_price;
+      }
+      state.totalAmount = totalPrice;
+    },
+    SET_AMOUNT_TO_PAY(state, amount) {
+      state.totalAmount = amount;
     }
   },
   actions: {
+    setAmountToPay(context, amount) {
+      context.commit("SET_AMOUNT_TO_PAY", amount);
+    },
+    setSelectedAccountNumber(contex, accountNumber) {
+      contex.commit("SET_ACCOUNT_NUMBER", accountNumber);
+    },
+    addContact(context, contact) {
+      context.commit("ADD_CONTACT", contact);
+    },
+    deleteHistory(context, index) {
+      context.commit("DELETE_HISTORY", index);
+    },
     addToHistory(context) {
       context.commit("ADD_TO_HISTORY");
     },
@@ -165,9 +205,12 @@ export default new Vuex.Store({
     setRecieptSheet(context) {
       context.commit("SET_RECIEPT_SHEET");
     },
+    amountToSelectServiceOPay(context) {
+      context.commit("AMOUNT_TO_SELECT_SERVICE_OPAY");
+    },
     serviceAdderToConfirmation(context) {
       context.commit("SERVICE_ADDER_TO_CONFIRMATION");
-      context.commit("SET_PUK_NUMBER", puk);
+      // context.commit("SET_PUK_NUMBER", puk);
     },
     confirmationToSuccess(context) {
       context.commit("ADD_TO_HISTORY");
@@ -181,10 +224,11 @@ export default new Vuex.Store({
       context.commit("SUCCESS_TO");
     },
     amountToSelectService(context) {
+      // contex.commit("SET_AMOUNT", amount);
       context.commit("AMOUNT_TO_SELECT_SERVICE");
     },
     selectService(context, service) {
-      console.log(service);
+      // console.log(service);
 
       context.commit("SET_SELECTED_SERVICE", service);
     },
@@ -200,9 +244,14 @@ export default new Vuex.Store({
         .then(r => r.data)
         .then(checkOutOrders => {
           // console.log(checkOutOrders);
+          // context.commit(
+          //   "SET_CHECK_OUT_ORDER_ITEMS",
+          //   checkOutOrders.account
+          // );
+
           context.commit("SET_CHECK_OUT_ORDER_ITEMS", checkOutOrders.items);
           context.commit("SET_ACCOUNT", checkOutOrders.account);
-          context.commit("SET_RECIEPT_SHEET");
+          context.commit("SET_TOTAL_AMOUNT", checkOutOrders.items);
         });
     },
     activateService(contex, index) {
@@ -210,6 +259,7 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    getTotalAmount: state => state.totalAmount,
     allHistories: state => state.histories,
     allAvaliableServices: state => state.avaliableServices,
     allActiveAvaliableServices: state => {
@@ -223,6 +273,10 @@ export default new Vuex.Store({
       return arr;
     },
     getCheckOutOrderItems: state => state.checkOutOrderItems,
-    getAccount: state => state.account
+    getAccount: state => state.account,
+    getContacts: state => state.contacts,
+    isDarkMode: state => state.darkMode,
+    getSelectedService: state => state.selectedService,
+    getSelectedAccountNumber: state => state.selectedAccountNumber
   }
 });
