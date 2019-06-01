@@ -1,53 +1,26 @@
 <template>
   <div class="text-xs-center">
-    <v-bottom-sheet v-model="serviceSelectorSheet" style="border-top-left-radius: 10px;">
-      <!-- <template v-slot:activator>
-        <v-btn color="purple" dark>Click me</v-btn>
-      </template>-->
-      <v-card>
-        <v-toolbar flat>
-          <v-list style="background-color: #e3e3e3;
-  border-bottom: 1px solid #a9a9a9;">
-            <v-list-tile>
-              Select Service
-              <!-- <v-list-tile-title class="title">Application</v-list-tile-title> -->
-            </v-list-tile>
-          </v-list>
-        </v-toolbar>
-        <v-card style="padding:20px;box-shadow:unset;height:400px;overflow:auto;">
-          <v-radio-group v-model="radios" :mandatory="false">
+    <v-card style="padding:0px;box-shadow:unset;max-height:400px;overflow:auto;">
+      <v-radio-group v-model="radios" :mandatory="false">
+        <div
+          v-for="(service,index) in allActiveAvaliableServices"
+          :key="index"
+          style="padding:10px;"
+          @click="radios = service.id;selectService(service)"
+        >
+          <!-- helo -->
+          <v-radio :value="service.id"></v-radio>
+          <div style="margin-top:-80px;padding:30px;display:flex;max-width:300px;overflow:hidden;">
             <div
-              v-for="(service,index) in allActiveAvaliableServices"
-              :key="index"
-              style="padding:10px;"
-              @click="radios = service.id;selectService(service)"
-            >
-              <!-- helo -->
-              <v-radio :value="service.id"></v-radio>
-              <div style="margin-top:-80px;padding:30px;display:flex;">
-                <div class="logo-holder" :style="{'background-color': service.color}"></div>
-                <div style="padding:20px;">{{service.name}}</div>
-
-                <!-- <div style="margin-top:40px;margin-left:-100px;">Hello</div> -->
-              </div>
-            </div>
-            <!-- <div style="padding:10px;" @click="radios='radio-2'">
-              <v-radio value="radio-2"></v-radio>
-              <div style="margin-top:-80px;padding:30px;display:flex;">
-                <div class="logo-holder"></div>
-                <div style="padding:20px;">Hello World</div>
-              </div>
-            </div>-->
-          </v-radio-group>
-        </v-card>
-        <v-btn
-          color="purple"
-          dark
-          @click="serviceAdderToConfirmation"
-          style="margin-right:200px"
-        >Continue</v-btn>
-      </v-card>
-    </v-bottom-sheet>
+              class="logo-holder"
+              style="width:120px;"
+              :style="{'background-color': service.color}"
+            ></div>
+            <div style="padding:10px;width:200px;">{{service.name}}</div>
+          </div>
+        </div>
+      </v-radio-group>
+    </v-card>
   </div>
 </template>
 <script>
