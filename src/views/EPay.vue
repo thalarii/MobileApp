@@ -1,28 +1,70 @@
 <template>
-  <div>
+  <div class="top-padding">
     <ToolBar></ToolBar>
-    <!-- <button @click="setRecieptSheet">OpenRecipt</button> -->
-    <v-card style="padding:50px;box-shadow:unset;">
-      <v-text-field
-        v-model="checkOutOrdeId"
-        @change="getCheckOutOrder(checkOutOrdeId)"
-        label="Check Out Order Id"
-        required
-      ></v-text-field>
-      <v-btn @click="scan">Scan</v-btn>
-      <v-btn @click="getCheckOutOrder(checkOutOrdeId)">Get</v-btn>
+    <v-card :dark="isDarkMode">
+      <v-stepper v-model="e6" vertical>
+        <v-stepper-step :complete="e6 > 1" step="1">
+          Check Out Order
+          <small>get check out order using qr code</small>
+        </v-stepper-step>
+
+        <v-stepper-content step="1">
+          <!-- <v-card style="box-shadow:unset;"> -->
+          <EpayInitial></EpayInitial>
+          <!-- </v-card> -->
+          <v-btn color="primary" @click="e6 = 2">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 2" step="2">Reciept</v-stepper-step>
+
+        <v-stepper-content step="2">
+          <Reciept></Reciept>
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 3">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 3" step="3">Select Payment Service</v-stepper-step>
+
+        <v-stepper-content step="3">
+          <SelectService></SelectService>
+
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 4">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 4" step="4">Confirmation</v-stepper-step>
+        <v-stepper-content step="4">
+          <Confirmation></Confirmation>
+
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 5">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step step="5">Done</v-stepper-step>
+        <v-stepper-content step="5">
+          <Success></Success>
+
+          <router-link to="/">
+            <v-btn color="primary" @click="addToHistory();e6 = 1">Done</v-btn>
+          </router-link>
+
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+      </v-stepper>
     </v-card>
-    <Reciept></Reciept>
-    <SelectService></SelectService>
-    <Confirmation></Confirmation>
-    <Success></Success>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 
 import ToolBar from "../components/ToolBar.vue";
+import EpayInitial from "../components/EpayInitial.vue";
+
 import Reciept from "../components/Reciept.vue";
 import SelectService from "../components/SelectService.vue";
 import Confirmation from "../components/Confirmation.vue";
@@ -36,21 +78,14 @@ export default {
       this.qrcodes = "watching...";
     }
   },
-  data: () => ({
-    qrcode: "",
-    qrcodes: "he",
-    checkOutOrdeId: ""
-    // recieptSheet: false
-  }),
-  computed: mapState([
-    // "checkOutOrderId",
-    "recieptSheet",
-    "serviceSelectorSheet",
-    "confirmationSheet",
-    "successSheet"
-  ]),
+  data() {
+    return {
+      e6: 1
+    };
+  },
+  computed: mapGetters(["isDarkMode"]),
   methods: {
-    ...mapActions(["setRecieptSheet", "getCheckOutOrder"]),
+    ...mapActions(["setRecieptSheet", "getCheckOutOrder", "addToHistory"]),
     // getCheckOutOrders: function() {
 
     // },
@@ -75,9 +110,14 @@ export default {
     Reciept,
     SelectService,
     Confirmation,
-    Success
+    Success,
+    EpayInitial
   }
 };
 </script>
 
-<style></style>
+<style>
+.top-padding {
+  padding-top: 55px;
+}
+</style>
