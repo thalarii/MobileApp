@@ -1,108 +1,132 @@
 <template>
-  <div>
+  <div class="top-padding">
     <ToolBar></ToolBar>
-    <v-card style="padding:50px;box-shadow:unset;">
-      <v-text-field
-        v-model="selectedAccountNumber"
-        @change="setAmountSheet"
-        label="Account Number"
-        required
-      ></v-text-field>
-      <!-- {{selectedAccountNumber}} -->
-      <v-btn @click="scan">Scan</v-btn>
-      <v-btn @click="setAmountSheet">Pay</v-btn>
+    <v-card :dark="isDarkMode">
+      <v-stepper v-model="e6" vertical>
+        <v-stepper-step :complete="e6 > 1" step="1">
+          Check Out Order
+          <small>get check out order using qr code</small>
+        </v-stepper-step>
+
+        <v-stepper-content step="1">
+          <!-- <v-card style="box-shadow:unset;"> -->
+          <OPayInitial></OPayInitial>
+          <ContactList></ContactList>
+          <!-- </v-card> -->
+          <v-btn color="primary" @click="e6 = 2">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 2" step="2">Reciept</v-stepper-step>
+
+        <v-stepper-content step="2">
+          <AmountSetter></AmountSetter>
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 3">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 3" step="3">Select Payment Service</v-stepper-step>
+
+        <v-stepper-content step="3">
+          <SelectService></SelectService>
+
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 4">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step :complete="e6 > 4" step="4">Confirmation</v-stepper-step>
+        <v-stepper-content step="4">
+          <Confirmation></Confirmation>
+
+          <!-- <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card> -->
+          <v-btn color="primary" @click="e6 = 5">Continue</v-btn>
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+
+        <v-stepper-step step="5">Done</v-stepper-step>
+        <v-stepper-content step="5">
+          <Success></Success>
+
+          <router-link to="/">
+            <v-btn color="primary" @click="addToHistory();e6 = 1">Done</v-btn>
+          </router-link>
+
+          <v-btn flat @click="e6=1">Cancel</v-btn>
+        </v-stepper-content>
+      </v-stepper>
     </v-card>
-    <v-card style="box-shadow:unset;">
-      <ContactList></ContactList>
-      <v-dialog v-model="dialog" width="500">
-        <!-- <template v-slot:activator="{ on }">
-          <v-btn color="red lighten-2" dark v-on="on">Click Me</v-btn>
-        </template>-->
-
-        <v-card style="padding:25px;">
-          <h3>Add Contact</h3>
-          <!-- <v-card-title class="headline grey lighten-2" primary-title>Privacy Policy</v-card-title> -->
-
-          <!-- <v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</v-card-text> -->
-          <div style="padding:10px;">
-            <v-text-field v-model="name" label="Full Name" required></v-text-field>
-            <v-text-field v-model="accountNumber" label="Account Number" required></v-text-field>
-            {{accountNumber}}
-          </div>
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              @click="addContact({accountNumber:accountNumber,name:name});dialog = false"
-              color="primary"
-              flat
-            >I accept</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-card>
-    <v-btn
-      @click="dialog=true"
-      v-model="fab"
-      color="primary"
-      dark
-      fab
-      fixed
-      bottom
-      right
-      style="margin-bottom:50px;"
-    >
-      <!-- <v-icon>{{ activeFab.icon }}</v-icon> -->
-      <v-icon>add</v-icon>
-    </v-btn>
-
-    <!-- <button @click="setAmountSheet">OPay</button> -->
-    <AmountSetter></AmountSetter>
-    <SelectService></SelectService>
-    <Confirmation></Confirmation>
-    <Success></Success>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 
 import ToolBar from "../components/ToolBar.vue";
+import OPayInitial from "../components/OPayInitial.vue";
 import AmountSetter from "../components/AmountSetter.vue";
+import ContactList from "../components/ContactList.vue";
+import Reciept from "../components/Reciept.vue";
 import SelectService from "../components/SelectService.vue";
 import Confirmation from "../components/Confirmation.vue";
 import Success from "../components/Success.vue";
-import ContactList from "../components/ContactList.vue";
-// import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "EPay",
-  data: () => ({
-    dialog: false,
-    name: "",
-    accountNumber: ""
-    // selectedAccountNumber: ""
-    // recieptSheet: false
-  }),
-  computed: mapState([
-    "recieptSheet",
-    "serviceSelectorSheet",
-    "confirmationSheet",
-    "successSheet",
-    "selectedAccountNumber"
-  ]),
-  methods: mapActions(["setAmountSheet", "addContact"]),
+  watch: {
+    qrcode: function() {
+      // this.getCheckOutOrder(this.qrcode);
+      this.qrcodes = "watching...";
+    }
+  },
+  data() {
+    return {
+      e6: 1
+    };
+  },
+  computed: mapGetters(["isDarkMode"]),
+  methods: {
+    ...mapActions([
+      "setRecieptSheet",
+      "getCheckOutOrder",
+      "addToHistory",
+      "setAmountSheet",
+      "addContact"
+    ]),
+    // getCheckOutOrders: function() {
+
+    // },
+    scan: function() {
+      this.qrcode = "result pending...";
+      // cordova.plugins.barcodeScanner.scan(
+      //   result => {
+      //     // this.qrcode = result.text;
+      //     this.checkOutOrdeId = result.text;
+      //   },
+      //   err => {
+      //     console.err(error);
+      //   }
+      // );
+    }
+    // getCheckOutOrders(){
+    //   this.
+    // }
+  },
   components: {
     ToolBar,
     AmountSetter,
     SelectService,
     Confirmation,
     Success,
-    ContactList
+    ContactList,
+    OPayInitial
   }
 };
 </script>
 
 <style>
+.top-padding {
+  padding-top: 55px;
+}
 </style>
